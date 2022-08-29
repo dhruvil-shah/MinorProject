@@ -19,5 +19,6 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/', views.home,name='home')
+    path('home/', views.home,name='home'),
+    path('addImage/<str:id>',views.addImages, name='addImage')
 ]
