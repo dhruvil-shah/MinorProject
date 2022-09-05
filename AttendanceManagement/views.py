@@ -8,8 +8,9 @@ import time
 import os
 import numpy as np
 import face_recognition
+import json
 
-encodeList = []
+
 images = []
 classNames = []
 
@@ -22,7 +23,6 @@ def addImages(request,id):
     cam_port = 0
     cam = cv2.VideoCapture(cam_port)
     img_path=os.path.join(MEDIA_ROOT,id)
-    print(img_path)
     os.mkdir(img_path)
     ct=0
     while True:
@@ -52,26 +52,19 @@ def trainModel(request):
             curImg = cv2.imread(f'{user_path}/{cl}')
             images.append(curImg)
             classNames.append(user)
-
-        for img in images:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            encode = face_recognition.face_encodings(img)[0]
-            encodeList.append(encode)
-        
     return HttpResponse("Training Model")
     
 def findEncodings(images):
-    encodeList = []
+    encodeListUtil = []
     for img in images:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
-        encodeList.append(encode)
-    return encodeList
+        if len(face_recognition.face_encodings(img))!=0:
+            encode = face_recognition.face_encodings(img)[0]    
+        encodeListUtil.append(encode)
+    return encodeListUtil
 
 def detectFaces(request):
-    encodeListKnown = findEncodings(images)
-    print(images)
-    print(encodeListKnown)
+    encodeListKnown=findEncodings(images)
     cap = cv2.VideoCapture(0)
     while True:
         success, img = cap.read()
@@ -85,6 +78,9 @@ def detectFaces(request):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             matchIndex = np.argmin(faceDis)
+            print(len(matches))
+            print(len(faceDis))
+            print(matchIndex)
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
                 y1, x2, y2, x1 = faceLoc
