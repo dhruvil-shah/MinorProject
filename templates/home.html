@@ -7,7 +7,7 @@
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
      <style>
          body {
-             background: url('{% static "recognition/img/bg_image.jpg"%}') no-repeat center center fixed;
+             background: url('{% static "images/bg_image.jpg"%}') no-repeat center center fixed;
              background-size: cover;
          }
      </style>
@@ -16,8 +16,8 @@
   <div class="col-lg-12" style="background: rgba(0,0,0,0.6);margin-top:3em;margin-bottom:5em;padding-top:1em;padding-bottom:3em;color:#fff;border-radius:10px;-webkit-box-shadow: 2px 2px 15px 0px rgba(0, 3, 0, 0.7);
   -moz-box-shadow:    2px 2px 15px 0px rgba(0, 3, 0, 0.7);
   box-shadow:         2px 2px 15px 0px rgba(0, 3, 0, 0.7);">
-          <div class="col-sm-12">
-              <h1 class="text-center section-title" style="margin-bottom:2em">Attendance System Using Face Recognition.</h1>
+          <div class="col-sm-12 ">
+              <h1 class="text-center " style="margin-bottom:2em">Attendance System Using Face Recognition</h1>
           </div>
           <style>
               h4 {
@@ -51,7 +51,7 @@
                   color: inherit;
                   text-decoration: none;
               }
-              /*
+              
         .section-title:after {
             content:' ';display:block;margin:0 auto;width:100px;margin-top: 6px;border:2px solid #d0d0d0;border-radius:4px;
             -webkit-border-radius:4px;
@@ -61,29 +61,38 @@
             -moz-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .05);
             margin-bottom:1em;
           }
-          */
+          .rowFlex{
+            margin: auto;
+            align:center;
+            justify-content:center;
+            align-items:center;
+          }
+          
           </style>
-          <div class="col-lg-12" style="padding-top: 100px;">
-            {% if messages %} {% for message in messages%}
-            <div class="alert alert-{{message.tags}}"> {{message}}
+          
+
+       <div class="d-flex justify-content-around  ">
+          <div>
+              <div class='rowFlex'>
+               <img onclick="myFunction()" src="{% static 'images/Add.png' %}" class="img-responsive" style="width:100px;height:100px ;" />
+               <h4 >Add Images</h4>
+               <script>
+                function myFunction() {
+                  let roll = prompt("Please enter Roll no:");
+                  if (roll !== null || roll !== "") {
+                     window.location.href=`http://127.0.0.1:8000/addImage/${roll}`;
+                  }
+                }
+                </script>
             </div>
-            {%endfor %} {%endif%}
-        </div>
-       <div class="row">
-
-
-          <div class="col-md-4" style="padding-left: 220px">
-               <a href='{%url "mark-your-attendance" %}'><img src="{% static 'recognition/img/Add.png' %}" class="img-responsive" style="width:300px;height:300px ;" /></a> 
-               
           </div>
-
-          <div class="col-md-4" style="padding-left: 220px">
-               <a href='{%url "mark-your-attendance-out" %}'><img src="{% static 'recognition/img/Register.png' %}" class="img-responsive" style="width:300px;height:300px ;" /></a> 
-
+          <div>
+               <a href='{%url "detectFaces" %}'><img src="{% static 'images/detect.jpg' %}" class="img-responsive" style="width:100px;height:100px ;" /></a> 
+               <h4> Detect</h4>
           </div>
-
-          <div class="col-md-4" style="padding-left: 220px">
-              <a href='{%url "login" %}'><img src="{% static 'recognition/img/report.png' %}" class="img-responsive" style="width:300px;height:300px" /></a> 
+          <div>
+              <a href='{%url "trainModel" %}'><img src="{% static 'images/Train.png' %}" class="img-responsive" style="width:100px;height:100px" /></a> 
+              <h4 >Train Model</h4>
           </div>
       </div> 
 
