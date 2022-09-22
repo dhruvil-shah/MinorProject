@@ -19,7 +19,7 @@ def home(request):
 
 
 def addImages(request,id):
-    MEDIA_ROOT='static'
+    MEDIA_ROOT='static/dataset'
     cam_port = 0
     cam = cv2.VideoCapture(cam_port)
     img_path=os.path.join(MEDIA_ROOT,id)
@@ -33,7 +33,7 @@ def addImages(request,id):
         print(f_path)
         cv2.imwrite(f_path,image)
         time.sleep(0.5)
-        if ct==10:
+        if ct==2:
             cv2.destroyAllWindows()
             break
         ct=ct+1
@@ -41,7 +41,31 @@ def addImages(request,id):
 
 
 def trainModel(request):
-    path_folder=os.path.join('static')
+    # path_folder=os.path.join('static/dataset')
+    # users=os.listdir(path_folder)
+    
+    # for user in users:
+    #     user_path=os.path.join(path_folder,user)
+    #     user_images=os.listdir(user_path)
+        
+    #     for cl in user_images:
+    #         curImg = cv2.imread(f'{user_path}/{cl}')
+    #         images.append(curImg)
+    #         classNames.append(user)
+    return HttpResponse("Training Model")
+    
+def findEncodings(images):
+    encodeListUtil = []
+    for img in images:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        encode=[]
+        if len(face_recognition.face_encodings(img))!=0:
+            encode = face_recognition.face_encodings(img)[0]    
+        encodeListUtil.append(encode)
+    return encodeListUtil
+
+def detectFaces(request):
+    path_folder=os.path.join('static/dataset')
     users=os.listdir(path_folder)
     
     for user in users:
@@ -52,18 +76,6 @@ def trainModel(request):
             curImg = cv2.imread(f'{user_path}/{cl}')
             images.append(curImg)
             classNames.append(user)
-    return HttpResponse("Training Model")
-    
-def findEncodings(images):
-    encodeListUtil = []
-    for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        if len(face_recognition.face_encodings(img))!=0:
-            encode = face_recognition.face_encodings(img)[0]    
-        encodeListUtil.append(encode)
-    return encodeListUtil
-
-def detectFaces(request):
     encodeListKnown=findEncodings(images)
     cap = cv2.VideoCapture(0)
     while True:
@@ -78,9 +90,9 @@ def detectFaces(request):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             matchIndex = np.argmin(faceDis)
-            print(len(matches))
-            print(len(faceDis))
-            print(matchIndex)
+            
+            print(faceDis)
+            
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
                 y1, x2, y2, x1 = faceLoc
