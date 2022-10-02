@@ -19,6 +19,9 @@ from . import views
 
 
 urlpatterns = [
+    path('logout/', views.logoutUser,name='logout'),
+    path('login/', views.loginPage,name='login'),
+    path('register/', views.registerPage,name='register'),
     path('admin/', admin.site.urls),
     path('home/', views.home,name='home'),
     path('addImage/<str:id>',views.addImages, name='addImage'),
