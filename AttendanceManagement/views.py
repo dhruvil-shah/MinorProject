@@ -2,12 +2,13 @@ from base64 import encode
 from codecs import EncodedFile
 from email.mime import image
 from ntpath import join
+from cv2 import RETR_CCOMP
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import cache_control
-
+from record.models import Record
 from django.contrib import messages
 
 from django.contrib.auth import authenticate,login,logout
@@ -121,9 +122,13 @@ def trainModel(request):
             images.append(curImg)
             classNames.append(user)
     encodedListKnown=[]
-    encodedListKnown.append(findEncodings(images))
+    encodedListKnown=findEncodings(images)
     data = asarray(encodedListKnown)
-    save('Utils/trainValues.npy', data)
+    print(data)
+    # save('Utils/trainValues.npy', data)
+    path="Utils/trainValues"
+    with open('{}.npy'.format(path), 'wb+') as f:
+        np.save(f, data)
     # file = open("Utils/trainValues.txt", "w+")
     # content = str(encodedListKnown)
     # file.write(content)
@@ -137,7 +142,7 @@ def findEncodings(images):
         encode=[]
         if len(face_recognition.face_encodings(img))!=0:
             encode = face_recognition.face_encodings(img)[0]    
-        encodeListUtil=encode
+        encodeListUtil.append(encode)
     return encodeListUtil
  
 def detectFaces(request):
@@ -146,7 +151,6 @@ def detectFaces(request):
     # content=np.array(content)
     # print(content[0][0])
     data = load('Utils/trainValues.npy')
-    print(data)
     encodeListKnown=data
     # encodeListKnown.append(data)
     # file.close()
@@ -163,8 +167,8 @@ def detectFaces(request):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             matchIndex = np.argmin(faceDis)
-            print(matchIndex)
-            print(len(matches))
+            # print(matchIndex)
+            # print(len(matches))
             
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
@@ -181,3 +185,8 @@ def detectFaces(request):
             cv2.destroyAllWindows()
             break
     return HttpResponse("Done with Detecting")
+
+def addSample(request):
+    rec=Record(roll_no="19BCE248",time="9-11")
+    rec.save()
+    return HttpResponse("Done")
