@@ -3,7 +3,18 @@ from codecs import EncodedFile
 from email.mime import image
 from ntpath import join
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.forms import inlineformset_factory
+from django.views.decorators.cache import cache_control
+
+from django.contrib import messages
+
+from django.contrib.auth import authenticate,login,logout
+
+from django.contrib.auth.decorators import login_required
+
+from .forms import CreateUserForm
 import cv2
 import time
 import os
@@ -16,7 +27,63 @@ from numpy import asarray,save,load
 images = []
 classNames = []
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True) 
+def registerPage(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        form = CreateUserForm()
+        if request.method == 'POST':
+            form=CreateUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+                user = form.cleaned_data.get('username')
+                messages.success(request,'Account was Created for ' + user)
+                return redirect('login')
 
+        context={'form':form}
+        return render(request,'register.html',context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True) 
+def loginPage(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user=authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request,user)
+                return redirect('home')
+            else:
+                messages.info(request,'Username or Password is Incorrect')
+
+        context={}
+        return render(request,'login.html',context)
+
+def logoutUser(request):
+    logout(request)
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user=authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request,user)
+                return redirect('home')
+            else:
+                messages.info(request,'Username or Password is Incorrect')
+
+        context={}
+        return render(request,'login.html',context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+@login_required(login_url='login')
 def home(request):
     return render(request,'home.html')
 
@@ -40,7 +107,6 @@ def addImages(request,id):
             break
         ct=ct+1
     return HttpResponse("Getting Your Image")
-
 
 def trainModel(request):
     path_folder=os.path.join('static/dataset')
@@ -73,7 +139,7 @@ def findEncodings(images):
             encode = face_recognition.face_encodings(img)[0]    
         encodeListUtil=encode
     return encodeListUtil
-
+ 
 def detectFaces(request):
     # file = open("Utils/trainValues.txt", "r")
     # content = file.read()
