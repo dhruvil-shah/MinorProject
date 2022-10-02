@@ -1,3 +1,4 @@
+from base64 import encode
 from codecs import EncodedFile
 from email.mime import image
 from ntpath import join
@@ -9,14 +10,15 @@ import os
 import numpy as np
 import face_recognition
 import json
+from numpy import asarray,save,load
 
 
 images = []
 classNames = []
 
+
 def home(request):
     return render(request,'home.html')
-
 
 def addImages(request,id):
     MEDIA_ROOT='static/dataset'
@@ -41,30 +43,6 @@ def addImages(request,id):
 
 
 def trainModel(request):
-    # path_folder=os.path.join('static/dataset')
-    # users=os.listdir(path_folder)
-    
-    # for user in users:
-    #     user_path=os.path.join(path_folder,user)
-    #     user_images=os.listdir(user_path)
-        
-    #     for cl in user_images:
-    #         curImg = cv2.imread(f'{user_path}/{cl}')
-    #         images.append(curImg)
-    #         classNames.append(user)
-    return HttpResponse("Training Model")
-    
-def findEncodings(images):
-    encodeListUtil = []
-    for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode=[]
-        if len(face_recognition.face_encodings(img))!=0:
-            encode = face_recognition.face_encodings(img)[0]    
-        encodeListUtil.append(encode)
-    return encodeListUtil
-
-def detectFaces(request):
     path_folder=os.path.join('static/dataset')
     users=os.listdir(path_folder)
     
@@ -76,7 +54,36 @@ def detectFaces(request):
             curImg = cv2.imread(f'{user_path}/{cl}')
             images.append(curImg)
             classNames.append(user)
-    encodeListKnown=findEncodings(images)
+    encodedListKnown=[]
+    encodedListKnown.append(findEncodings(images))
+    data = asarray(encodedListKnown)
+    save('Utils/trainValues.npy', data)
+    # file = open("Utils/trainValues.txt", "w+")
+    # content = str(encodedListKnown)
+    # file.write(content)
+    # file.close()
+    return HttpResponse("Training Model")
+    
+def findEncodings(images):
+    encodeListUtil = []
+    for img in images:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        encode=[]
+        if len(face_recognition.face_encodings(img))!=0:
+            encode = face_recognition.face_encodings(img)[0]    
+        encodeListUtil=encode
+    return encodeListUtil
+
+def detectFaces(request):
+    # file = open("Utils/trainValues.txt", "r")
+    # content = file.read()
+    # content=np.array(content)
+    # print(content[0][0])
+    data = load('Utils/trainValues.npy')
+    print(data)
+    encodeListKnown=data
+    # encodeListKnown.append(data)
+    # file.close()
     cap = cv2.VideoCapture(0)
     while True:
         success, img = cap.read()
@@ -90,8 +97,8 @@ def detectFaces(request):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             matchIndex = np.argmin(faceDis)
-            
-            print(faceDis)
+            print(matchIndex)
+            print(len(matches))
             
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
