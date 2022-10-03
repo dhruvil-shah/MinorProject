@@ -145,7 +145,8 @@ def findEncodings(images):
         encodeListUtil.append(encode)
     return encodeListUtil
  
-def detectFaces(request):
+def detectFaces(request,course):
+    detectedRoll=set()
     # file = open("Utils/trainValues.txt", "r")
     # content = file.read()
     # content=np.array(content)
@@ -172,6 +173,7 @@ def detectFaces(request):
             
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
+                detectedRoll.add(name)
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
@@ -183,10 +185,18 @@ def detectFaces(request):
         key=cv2.waitKey(1)
         if key==27:
             cv2.destroyAllWindows()
+            for roll in detectedRoll:
+                rec=Record(roll_no=roll,course=course,time="9-11")
+                rec.save()   
             break
     return HttpResponse("Done with Detecting")
 
+def showRecord(request):
+
+    return HttpResponse("Record Shown")
+
+
 def addSample(request):
-    rec=Record(roll_no="19BCE248",time="9-11")
-    rec.save()
+    
+    Record.objects.all().delete()
     return HttpResponse("Done")

@@ -26,6 +26,6 @@ urlpatterns = [
     path('home/', views.home,name='home'),
     path('addImage/<str:id>',views.addImages, name='addImage'),
     path('trainModel/',views.trainModel, name='trainModel'),
-    path('detectFaces/',views.detectFaces, name='detectFaces'),
+    path('detectFaces/<str:course>',views.detectFaces, name='detectFaces'),
     path('addSample/',views.addSample, name='addSample')
 ]
