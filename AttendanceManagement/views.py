@@ -172,31 +172,28 @@ def detectFaces(request,course):
             # print(len(matches))
             
             if matches[matchIndex]:
-                name = classNames[matchIndex].upper()
-                detectedRoll.add(name)
+                roll = classNames[matchIndex].upper()
+                detectedRoll.add(roll)
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
-                cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-                # markAttendance(name)
+                cv2.putText(img, roll, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
 
         cv2.imshow('Webcam', img)
         key=cv2.waitKey(1)
         if key==27:
             cv2.destroyAllWindows()
             for roll in detectedRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11")
+                rec=Record(roll_no=roll,course=course,time="9-11",present=True)
                 rec.save()   
             break
     return HttpResponse("Done with Detecting")
 
 def showRecord(request):
-
     return HttpResponse("Record Shown")
 
 
 def addSample(request):
-    
     Record.objects.all().delete()
     return HttpResponse("Done")
