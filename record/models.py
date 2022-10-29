@@ -14,8 +14,12 @@ class Record(models.Model):
     present=models.BooleanField(default=False)
 
 class CourseStudent(models.Model):
-    id=models.AutoField
     roll_no=models.CharField(max_length=20)
-    course=models.CharField(default="",max_length=20)
+    course_1=models.CharField(default="",max_length=20)
+    course_2=models.CharField(default="",max_length=20)
+    course_d1=models.CharField(default="",max_length=20)
+    course_d2=models.CharField(default="",max_length=20)
+    course_o1=models.CharField(default="",max_length=20)
+    course_o2=models.CharField(default="",max_length=20)
     
 

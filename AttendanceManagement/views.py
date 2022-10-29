@@ -1,14 +1,20 @@
 from base64 import encode
 from codecs import EncodedFile
 from email.mime import image
+from http.client import HTTP_PORT
+from logging.handlers import DatagramHandler
+from django.http import JsonResponse
 from ntpath import join
+from colorama import Cursor
 from cv2 import RETR_CCOMP
+from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import cache_control
 from record.models import Record
+from record.models import CourseStudent
 from django.contrib import messages
 
 from django.contrib.auth import authenticate,login,logout
@@ -22,11 +28,13 @@ import os
 import numpy as np
 import face_recognition
 import json
-from numpy import asarray,save,load
+from numpy import asarray, roll,save,load
 
 
 images = []
 classNames = []
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True) 
 def registerPage(request):
@@ -82,6 +90,11 @@ def logoutUser(request):
 
         context={}
         return render(request,'login.html',context)
+    
+def dashboard(request):
+    return render(request,'dashboard.html')
+
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
@@ -147,6 +160,13 @@ def findEncodings(images):
  
 def detectFaces(request,course):
     detectedRoll=set()
+    allRoll=set()
+    absentRoll=set()
+    data=CourseStudent.objects.all()
+    for dt in data.iterator():
+        if dt.course_1==course or dt.course_2==course or dt.course_d1==course or dt.course_d2==course or dt.course_o1==course or dt.course_o2==course:
+            allRoll.add(dt.roll_no)
+    
     # file = open("Utils/trainValues.txt", "r")
     # content = file.read()
     # content=np.array(content)
@@ -184,8 +204,12 @@ def detectFaces(request,course):
         key=cv2.waitKey(1)
         if key==27:
             cv2.destroyAllWindows()
+            absentRoll=allRoll.difference(detectedRoll)
             for roll in detectedRoll:
                 rec=Record(roll_no=roll,course=course,time="9-11",present=True)
+                rec.save() 
+            for roll in absentRoll:
+                rec=Record(roll_no=roll,course=course,time="9-11",present=False)
                 rec.save()   
             break
     return HttpResponse("Done with Detecting")
@@ -193,7 +217,20 @@ def detectFaces(request,course):
 def showRecord(request):
     return HttpResponse("Record Shown")
 
-
 def addSample(request):
-    Record.objects.all().delete()
+    # cs=CourseStudent(roll_no="19BCE161",course_1="2CS701",course_2="2CS702",course_d1="2CSDE01",course_d2="2CSDE02",course_o1="2MEOE01",course_o2="2ICOE02")
+    # cs.save()
     return HttpResponse("Done")
+
+def getAttendance(request,course_id,roll_no):
+    no_present=Record.objects.filter(course=course_id,roll_no=roll_no,present=True)
+    no_absent=Record.objects.filter(course=course_id,roll_no=roll_no,present=False)
+    return JsonResponse({'present':len(no_present),'absent':len(no_absent)})
+
+
+
+def courseOption(request):
+    context={}
+    return render(request,'options.html',context)
+
+

@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <style>
+        body {
+            background: url('{% static "images/bg_image.jpg"%}') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .options{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            
+            margin: 250px auto ;
+            /* width: 250px; */
+            height: 50px;
+            
+        }
+        .option-menu{
+            /* width: 250px; */
+            text-align: center;
+            border: 3px solid rgb(108, 108, 137);
+            border-radius: 20px;
+            font-size: 2rem;
+            padding: 4px;
+            height: 50px;
+            
+        }
+        #btn{
+            display: block;
+            background-color: black;
+            border:1px solid white;
+            color: white;
+            padding: 2px;
+            width: 40px;
+            border-radius: 5px;
+
+        }
+        #btn:hover{
+            border: 1px solid black;
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="options">
+        <select class="option-menu" id="menu" >
+            <option value="2CS701">2CS701-Compiler Construction</option>
+            <option value="2CS702">2CS702-Big Data Analytics</option>
+            <option value="2CSDE01">2CSDE01-Artificial Intelligence</option>
+            <option value="2CSDE02">2CSDE02-Blockchain Technology</option>
+            <option value="2MEOE01">2MEOE01-Supply Chain Management</option>
+            <option value="2ICOE02">2ICOE02-Machine Vision</option>
+        </select>
+        <button id="btn" onclick="myfunction(this)">Go</button>
+    </div>
+    
+    <script>
+        const myfunction=(e)=>{
+        var course = $(".option-menu").val();
+        console.log(course);
+        window.location.href=`http://127.0.0.1:8000/detectFaces/${course}`;
+        }
+    </script>
+</body>
+</html>

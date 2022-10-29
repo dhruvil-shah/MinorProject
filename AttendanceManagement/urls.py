@@ -22,10 +22,13 @@ urlpatterns = [
     path('logout/', views.logoutUser,name='logout'),
     path('login/', views.loginPage,name='login'),
     path('register/', views.registerPage,name='register'),
+    path('dashboard/', views.dashboard,name='dashboard'),
     path('admin/', admin.site.urls),
     path('home/', views.home,name='home'),
     path('addImage/<str:id>',views.addImages, name='addImage'),
     path('trainModel/',views.trainModel, name='trainModel'),
     path('detectFaces/<str:course>',views.detectFaces, name='detectFaces'),
-    path('addSample/',views.addSample, name='addSample')
+    path('addSample/',views.addSample, name='addSample'),
+    path('courseOption/',views.courseOption, name='courseOption'),
+    path('getAttendance/<str:course_id>/<str:roll_no>',views.getAttendance, name='getAttendance')
 ]
