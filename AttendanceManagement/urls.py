@@ -30,5 +30,6 @@ urlpatterns = [
     path('detectFaces/<str:course>',views.detectFaces, name='detectFaces'),
     path('addSample/',views.addSample, name='addSample'),
     path('courseOption/',views.courseOption, name='courseOption'),
-    path('getAttendance/<str:course_id>/<str:roll_no>',views.getAttendance, name='getAttendance')
+    path('getAttendance/<str:course_id>/<str:roll_no>',views.getAttendance, name='getAttendance'),
+     path('getCourses/<str:roll_no>',views.getCourses, name='getCourses')
 ]

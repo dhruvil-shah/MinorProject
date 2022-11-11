@@ -21,6 +21,8 @@ from django.contrib.auth import authenticate,login,logout
 
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.models import User, Group
+
 from .forms import CreateUserForm
 import cv2
 import time
@@ -56,7 +58,10 @@ def registerPage(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True) 
 def loginPage(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        if request.user.is_staff:
+            return redirect('home')
+        else:
+            return redirect('dashboard')
     else:
         if request.method == 'POST':
             username = request.POST.get('username')
@@ -65,7 +70,10 @@ def loginPage(request):
 
             if user is not None:
                 login(request,user)
-                return redirect('home')
+                if request.user.is_staff:
+                    return redirect('home')
+                else:
+                    return redirect('dashboard')
             else:
                 messages.info(request,'Username or Password is Incorrect')
 
@@ -75,7 +83,10 @@ def loginPage(request):
 def logoutUser(request):
     logout(request)
     if request.user.is_authenticated:
-        return redirect('home')
+        if request.user.is_staff:
+            return redirect('home')
+        else:
+            return redirect('dashboard')
     else:
         if request.method == 'POST':
             username = request.POST.get('username')
@@ -84,23 +95,48 @@ def logoutUser(request):
 
             if user is not None:
                 login(request,user)
-                return redirect('home')
+                if request.user.is_staff:
+                    return redirect('home')
+                else:
+                    return redirect('dashboard')
             else:
                 messages.info(request,'Username or Password is Incorrect')
 
         context={}
         return render(request,'login.html',context)
-    
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+@login_required(login_url='login')
 def dashboard(request):
-    return render(request,'dashboard.html')
+    if request.user.is_staff:
+        return redirect('home')
+    else:
+        roll_no=request.user
+        print(roll_no)
+        courses=getCourses(request,roll_no)
+        a1=getAttendance(request,courses.course_1,roll_no)
+        a2=getAttendance(request,courses.course_2,roll_no)
+        a3=getAttendance(request,courses.course_d2,roll_no)
+        a4=getAttendance(request,courses.course_o2,roll_no)
+        a5=getAttendance(request,courses.course_d1,roll_no)
+        a6=getAttendance(request,courses.course_o1,roll_no)
+        lst=[a1,a2,a3,a4,a5,a6]
+        context={"data":lst}
+        print(lst)
+        return render(request,'dashboard.html',context)
 
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
 def home(request):
-    return render(request,'home.html')
+    if request.user.is_staff:
+        return render(request,'home.html')
+    else:
+        return redirect('dashboard')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+@login_required(login_url='login')
 def addImages(request,id):
     MEDIA_ROOT='static/dataset'
     cam_port = 0
@@ -122,6 +158,8 @@ def addImages(request,id):
         ct=ct+1
     return HttpResponse("Getting Your Image")
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+@login_required(login_url='login')
 def trainModel(request):
     path_folder=os.path.join('static/dataset')
     users=os.listdir(path_folder)
@@ -147,7 +185,8 @@ def trainModel(request):
     # file.write(content)
     # file.close()
     return HttpResponse("Training Model")
-    
+
+
 def findEncodings(images):
     encodeListUtil = []
     for img in images:
@@ -157,7 +196,7 @@ def findEncodings(images):
             encode = face_recognition.face_encodings(img)[0]    
         encodeListUtil.append(encode)
     return encodeListUtil
- 
+
 def detectFaces(request,course):
     detectedRoll=set()
     allRoll=set()
@@ -225,9 +264,11 @@ def addSample(request):
 def getAttendance(request,course_id,roll_no):
     no_present=Record.objects.filter(course=course_id,roll_no=roll_no,present=True)
     no_absent=Record.objects.filter(course=course_id,roll_no=roll_no,present=False)
-    return JsonResponse({'present':len(no_present),'absent':len(no_absent)})
+    return {"course_id":course_id,'present':len(no_present),'absent':len(no_absent)}
 
-
+def getCourses(request,roll_no):
+    course=CourseStudent.objects.get(roll_no=roll_no)
+    return course
 
 def courseOption(request):
     context={}
