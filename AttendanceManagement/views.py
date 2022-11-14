@@ -1,5 +1,6 @@
 from base64 import encode
 from codecs import EncodedFile
+# from curses import window
 from email.mime import image
 from http.client import HTTP_PORT
 from logging.handlers import DatagramHandler
@@ -55,6 +56,7 @@ def registerPage(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True) 
 def loginPage(request):
+    
     if request.user.is_authenticated:
         return redirect('home')
     else:
@@ -176,6 +178,8 @@ def detectFaces(request,course):
     # encodeListKnown.append(data)
     # file.close()
     cap = cv2.VideoCapture(0)
+    address='https://192.168.1.139:8080/video'
+    cap.open(address)
     while True:
         success, img = cap.read()
         imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
@@ -223,6 +227,7 @@ def addSample(request):
     return HttpResponse("Done")
 
 def getAttendance(request,course_id,roll_no):
+    
     no_present=Record.objects.filter(course=course_id,roll_no=roll_no,present=True)
     no_absent=Record.objects.filter(course=course_id,roll_no=roll_no,present=False)
     return JsonResponse({'present':len(no_present),'absent':len(no_absent)})
