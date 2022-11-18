@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <!-- Required meta tags -->
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="{% static "owl.carousel.min.css"%}">
+     <link rel="stylesheet" href="{% static "bootstrap.min.css"%}">
+     <link rel="stylesheet" href="{% static "style2.css"%}">
+     <style>
+      .detail{
+        float:right;
+      }
+      .btn {
+        border: 2px solid black;
+        background-color: white;
+        color: black;
+        padding: 14px 28px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      
+      /* Green */
+      .success {
+        border-color: #04AA6D;
+        color: green;
+      }
+      
+      .success:hover {
+        background-color: #04AA6D;
+        color: white;
+      }
+      
+      /* Blue */
+      .info {
+        border-color: #2196F3;
+        color: dodgerblue;
+      }
+      
+      .info:hover {
+        background: #2196F3;
+        color: white;
+      }
+      
+      /* Orange */
+      .warning {
+        border-color: #ff9800;
+        color: orange;
+      }
+      
+      .warning:hover {
+        background: #ff9800;
+        color: white;
+      }
+      
+      /* Red */
+      .danger {
+        border-color: #f44336;
+        color: red;
+      }
+      
+      .danger:hover {
+        background: #f44336;
+        color: white;
+      }
+      
+      /* Gray */
+      .default {
+        border-color: #e7e7e7;
+        color: black;
+      }
+      
+      .default:hover {
+        background: #e7e7e7;
+      }
+     </style>
+</head>
+<body>
+  <div class="detail">
+    <h4><span class="hello-msg" style="color:white" >Hello {{request.user}} <button class="btn success"><a  style="color:black" class="hello-msg" href="{% url 'logout' %}">Logout</a></button> </span>
+    </h4>
+  </div>
+
+  <div class="content">
+    <div class="container">
+      <h2 class="mb-5">ATTENDANCE DETAILS</h2>
+      <div class="table-responsive">
+        <table class="table table-striped custom-table">
+          <thead class="thead-light">
+        <tr>
+          <th scope="col">Course_Name</th>
+          <th scope="col">Present</th>
+          <th scope="col">Absent</th>
+        </tr>
+      </thead>
+          <tbody>
+            <tbody>
+              {% for line in data %}
+              <tr>
+                <td>{{ line.course_id }}</td>
+                <td>{{ line.present }}</td>
+                <td>{{ line.absent }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+    <script src="{% static "jquery-3.3.1.min.js"%}"></script>
+    <script src="{% static "popper.min.js"%}"></script>
+    <script src="{% static "bootstrap.min.js"%}"></script>
+    <script src="{% static "main.js"%}"></script>
+
+</body>
+</html>
