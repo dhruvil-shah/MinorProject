@@ -286,4 +286,10 @@ def courseOption(request):
     context={}
     return render(request,'options.html',context)
 
-
+def getDetailAttendance(request,roll_no,course_id):
+    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    # return detail_attendance
+    # print(detail_attendance)
+    # for att in detail_attendance:
+    #     print(att.date)
+    return HttpResponse("Done with Detail Attendance")
