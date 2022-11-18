@@ -1,5 +1,6 @@
 from base64 import encode
 from codecs import EncodedFile
+import datetime
 # from curses import window
 from email.mime import image
 from http.client import HTTP_PORT
@@ -14,7 +15,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import cache_control
-from record.models import Record
+from record.models import Record 
 from record.models import CourseStudent
 from django.contrib import messages
 
@@ -217,8 +218,9 @@ def detectFaces(request,course):
     # encodeListKnown.append(data)
     # file.close()
     cap = cv2.VideoCapture(0)
-    address='https://192.168.1.139:8080/video'
-    cap.open(address)
+    # For access with phone 
+    # address='https://192.168.222.210:8080/video'
+    # cap.open(address)
     while True:
         success, img = cap.read()
         imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
@@ -230,6 +232,9 @@ def detectFaces(request,course):
         for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
+            min_dis=min(faceDis)
+            if min_dis>0.3:
+                continue
             matchIndex = np.argmin(faceDis)
             # print(matchIndex)
             # print(len(matches))
@@ -249,10 +254,10 @@ def detectFaces(request,course):
             cv2.destroyAllWindows()
             absentRoll=allRoll.difference(detectedRoll)
             for roll in detectedRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",present=True)
+                rec=Record(roll_no=roll,course=course,time="9-11",date=datetime.datetime.now(),present=True)
                 rec.save() 
             for roll in absentRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",present=False)
+                rec=Record(roll_no=roll,course=course,time="9-11",date=datetime.datetime.now(),present=False)
                 rec.save()   
             break
     return HttpResponse("Done with Detecting")
@@ -263,6 +268,8 @@ def showRecord(request):
 def addSample(request):
     # cs=CourseStudent(roll_no="19BCE161",course_1="2CS701",course_2="2CS702",course_d1="2CSDE01",course_d2="2CSDE02",course_o1="2MEOE01",course_o2="2ICOE02")
     # cs.save()
+    cs=Record(id='10',roll_no="19BCE248",course="11",time="9-11",date=datetime.datetime.now())
+    cs.save()
     return HttpResponse("Done")
 
 def getAttendance(request,course_id,roll_no):
