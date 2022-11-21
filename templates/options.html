@@ -21,11 +21,13 @@
             
             margin: 250px auto ;
             /* width: 250px; */
-            height: 50px;
+            
             
         }
         .option-menu{
+            background-color:black;
             /* width: 250px; */
+            color:white;
             text-align: center;
             border: 3px solid rgb(108, 108, 137);
             border-radius: 20px;
@@ -40,7 +42,8 @@
             border:1px solid white;
             color: white;
             padding: 2px;
-            width: 40px;
+            width: 80px;
+            height:20px;
             border-radius: 5px;
 
         }
@@ -49,10 +52,20 @@
             background-color: white;
             color: black;
         }
+        .lb{
+            color:white;
+            
+        }
+        #appt1,#appt2{
+            
+            width:80px;
+            height:20px;
+        }
     </style>
 </head>
 <body>
     <div class="options">
+        <div>
         <select class="option-menu" id="menu" >
             <option value="2CS701">2CS701-Compiler Construction</option>
             <option value="2CS702">2CS702-Big Data Analytics</option>
@@ -61,14 +74,23 @@
             <option value="2MEOE01">2MEOE01-Supply Chain Management</option>
             <option value="2ICOE02">2ICOE02-Machine Vision</option>
         </select>
+        </div>
+        
+        <label class='lb' for="appt1"><u>Select a time:</u></label>
+        <div>
+        <input type="time" id="appt1" name="appt">
+        <input type="time" id="appt2" name="appt">
+    </div>
         <button id="btn" onclick="myfunction(this)">Go</button>
     </div>
     
     <script>
         const myfunction=(e)=>{
         var course = $(".option-menu").val();
-        console.log(course);
-        window.location.href=`http://127.0.0.1:8000/detectFaces/${course}`;
+        var start= $("#appt1").val();
+        var end=$("#appt2").val();
+        console.log(course,start,end);
+        window.location.href=`http://127.0.0.1:8000/detectFaces/${course}/${start}/${end}`;
         }
     </script>
 </body>

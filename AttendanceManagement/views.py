@@ -161,9 +161,9 @@ def addImages(request,id):
         ct=ct+1
     return HttpResponse("Getting Your Image")
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
-@login_required(login_url='login')
-def trainModel(request):
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+# @login_required(login_url='login')
+def trainModel():
     path_folder=os.path.join('static/dataset')
     users=os.listdir(path_folder)
     
@@ -178,16 +178,16 @@ def trainModel(request):
     encodedListKnown=[]
     encodedListKnown=findEncodings(images)
     data = asarray(encodedListKnown)
-    print(data)
-    # save('Utils/trainValues.npy', data)
-    path="Utils/trainValues"
-    with open('{}.npy'.format(path), 'wb+') as f:
-        np.save(f, data)
-    # file = open("Utils/trainValues.txt", "w+")
-    # content = str(encodedListKnown)
-    # file.write(content)
-    # file.close()
-    return HttpResponse("Training Model")
+    # print(data)
+    # # save('Utils/trainValues.npy', data)
+    # path="Utils/trainValues"
+    # with open('{}.npy'.format(path), 'wb+') as f:
+    #     np.save(f, data)
+    # # file = open("Utils/trainValues.txt", "w+")
+    # # content = str(encodedListKnown)
+    # # file.write(content)
+    # # file.close()
+    return data
 
 
 def findEncodings(images):
@@ -200,7 +200,8 @@ def findEncodings(images):
         encodeListUtil.append(encode)
     return encodeListUtil
 
-def detectFaces(request,course):
+def detectFaces(request,course,start,end):
+    data_train=trainModel()
     detectedRoll=set()
     allRoll=set()
     absentRoll=set()
@@ -213,8 +214,8 @@ def detectFaces(request,course):
     # content = file.read()
     # content=np.array(content)
     # print(content[0][0])
-    data = load('Utils/trainValues.npy')
-    encodeListKnown=data
+    # data = load('Utils/trainValues.npy')
+    encodeListKnown=data_train
     # encodeListKnown.append(data)
     # file.close()
     cap = cv2.VideoCapture(0)
@@ -254,10 +255,10 @@ def detectFaces(request,course):
             cv2.destroyAllWindows()
             absentRoll=allRoll.difference(detectedRoll)
             for roll in detectedRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",date=datetime.datetime.now(),present=True)
+                rec=Record(roll_no=roll,course=course,time=""+start+"-"+end+"",date=datetime.datetime.now(),present=True)
                 rec.save() 
             for roll in absentRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",date=datetime.datetime.now(),present=False)
+                rec=Record(roll_no=roll,course=course,time=""+start+"-"+end+"",date=datetime.datetime.now(),present=False)
                 rec.save()   
             break
     return HttpResponse("Done with Detecting")
