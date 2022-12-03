@@ -75,6 +75,23 @@
       .default:hover {
         background: #e7e7e7;
       }
+      table{
+        border: 1px solid black;
+        width: 50%;
+        height: 50%;
+      }
+      tr{
+        margin:auto;
+        style="text-align: center";
+        border: 1px solid black;
+        width: 50%;
+        height: 50%;
+      }
+      td {
+        border-right: solid 1px black; 
+        border-left: solid 1px black;
+        style="text-align: center";
+      }
      </style>
 </head>
 <body>
@@ -90,18 +107,24 @@
         <table class="table table-striped custom-table">
           <thead class="thead-light">
         <tr>
+          <td scope="col">sub.no</th>
           <th scope="col">Course_Name</th>
           <th scope="col">Present</th>
           <th scope="col">Absent</th>
+          <th scope="col">Percentage</th>
+          <th scope="col">Detailed ATTENDANCE</th>
         </tr>
       </thead>
           <tbody>
             <tbody>
               {% for line in data %}
               <tr>
+                <td>{{line.serial_no}}</td>
                 <td>{{ line.course_id }}</td>
                 <td>{{ line.present }}</td>
                 <td>{{ line.absent }}</td>
+                <td>{{ line.percentage}}</td>
+                <td><a href=" ">View</a></td>
               </tr>
               {% endfor %}
             </tbody>

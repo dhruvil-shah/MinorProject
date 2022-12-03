@@ -116,12 +116,12 @@ def dashboard(request):
         roll_no=request.user
         print(roll_no)
         courses=getCourses(request,roll_no)
-        a1=getAttendance(request,courses.course_1,roll_no)
-        a2=getAttendance(request,courses.course_2,roll_no)
-        a3=getAttendance(request,courses.course_d2,roll_no)
-        a4=getAttendance(request,courses.course_o2,roll_no)
-        a5=getAttendance(request,courses.course_d1,roll_no)
-        a6=getAttendance(request,courses.course_o1,roll_no)
+        a1=getAttendance(request,courses.course_1,roll_no,1)
+        a2=getAttendance(request,courses.course_2,roll_no,2)
+        a3=getAttendance(request,courses.course_d2,roll_no,3)
+        a4=getAttendance(request,courses.course_o2,roll_no,4)
+        a5=getAttendance(request,courses.course_d1,roll_no,5)
+        a6=getAttendance(request,courses.course_o1,roll_no,6)
         lst=[a1,a2,a3,a4,a5,a6]
         context={"data":lst}
         print(lst)
@@ -265,11 +265,14 @@ def addSample(request):
     # cs.save()
     return HttpResponse("Done")
 
-def getAttendance(request,course_id,roll_no):
+def getAttendance(request,course_id,roll_no,sr):
     
     no_present=Record.objects.filter(course=course_id,roll_no=roll_no,present=True)
     no_absent=Record.objects.filter(course=course_id,roll_no=roll_no,present=False)
-    return {"course_id":course_id,'present':len(no_present),'absent':len(no_absent)}
+    percentage=100
+    if (len(no_absent)+len(no_present))!=0:
+        percentage=(len(no_present)/((len(no_absent)+len(no_present))))*100
+    return {"serial_no":sr,"course_id":course_id,'present':len(no_present),'absent':len(no_absent),"percentage":percentage}
 
 def getCourses(request,roll_no):
     course=CourseStudent.objects.get(roll_no=roll_no)
