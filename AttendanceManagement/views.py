@@ -1,5 +1,6 @@
 from base64 import encode
 from codecs import EncodedFile
+import datetime
 # from curses import window
 from email.mime import image
 from http.client import HTTP_PORT
@@ -14,7 +15,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 from django.views.decorators.cache import cache_control
-from record.models import Record
+from record.models import Record 
 from record.models import CourseStudent
 from django.contrib import messages
 
@@ -160,9 +161,9 @@ def addImages(request,id):
         ct=ct+1
     return HttpResponse("Getting Your Image")
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
-@login_required(login_url='login')
-def trainModel(request):
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+# @login_required(login_url='login')
+def trainModel():
     path_folder=os.path.join('static/dataset')
     users=os.listdir(path_folder)
     
@@ -177,16 +178,16 @@ def trainModel(request):
     encodedListKnown=[]
     encodedListKnown=findEncodings(images)
     data = asarray(encodedListKnown)
-    print(data)
-    # save('Utils/trainValues.npy', data)
-    path="Utils/trainValues"
-    with open('{}.npy'.format(path), 'wb+') as f:
-        np.save(f, data)
-    # file = open("Utils/trainValues.txt", "w+")
-    # content = str(encodedListKnown)
-    # file.write(content)
-    # file.close()
-    return HttpResponse("Training Model")
+    # print(data)
+    # # save('Utils/trainValues.npy', data)
+    # path="Utils/trainValues"
+    # with open('{}.npy'.format(path), 'wb+') as f:
+    #     np.save(f, data)
+    # # file = open("Utils/trainValues.txt", "w+")
+    # # content = str(encodedListKnown)
+    # # file.write(content)
+    # # file.close()
+    return data
 
 
 def findEncodings(images):
@@ -199,7 +200,8 @@ def findEncodings(images):
         encodeListUtil.append(encode)
     return encodeListUtil
 
-def detectFaces(request,course):
+def detectFaces(request,course,start,end):
+    data_train=trainModel()
     detectedRoll=set()
     allRoll=set()
     absentRoll=set()
@@ -212,13 +214,14 @@ def detectFaces(request,course):
     # content = file.read()
     # content=np.array(content)
     # print(content[0][0])
-    data = load('Utils/trainValues.npy')
-    encodeListKnown=data
+    # data = load('Utils/trainValues.npy')
+    encodeListKnown=data_train
     # encodeListKnown.append(data)
     # file.close()
     cap = cv2.VideoCapture(0)
-    address='https://192.168.1.139:8080/video'
-    cap.open(address)
+    # For access with phone 
+    # address='https://192.168.222.210:8080/video'
+    # cap.open(address)
     while True:
         success, img = cap.read()
         imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
@@ -230,6 +233,9 @@ def detectFaces(request,course):
         for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
+            min_dis=min(faceDis)
+            if min_dis>0.3:
+                continue
             matchIndex = np.argmin(faceDis)
             # print(matchIndex)
             # print(len(matches))
@@ -249,10 +255,10 @@ def detectFaces(request,course):
             cv2.destroyAllWindows()
             absentRoll=allRoll.difference(detectedRoll)
             for roll in detectedRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",present=True)
+                rec=Record(roll_no=roll,course=course,time=""+start+"-"+end+"",date=datetime.datetime.now(),present=True)
                 rec.save() 
             for roll in absentRoll:
-                rec=Record(roll_no=roll,course=course,time="9-11",present=False)
+                rec=Record(roll_no=roll,course=course,time=""+start+"-"+end+"",date=datetime.datetime.now(),present=False)
                 rec.save()   
             break
     return HttpResponse("Done with Detecting")
@@ -263,6 +269,8 @@ def showRecord(request):
 def addSample(request):
     # cs=CourseStudent(roll_no="19BCE161",course_1="2CS701",course_2="2CS702",course_d1="2CSDE01",course_d2="2CSDE02",course_o1="2MEOE01",course_o2="2ICOE02")
     # cs.save()
+    cs=Record(id='10',roll_no="19BCE248",course="11",time="9-11",date=datetime.datetime.now())
+    cs.save()
     return HttpResponse("Done")
 
 def getAttendance(request,course_id,roll_no,sr):
@@ -282,4 +290,10 @@ def courseOption(request):
     context={}
     return render(request,'options.html',context)
 
-
+def getDetailAttendance(request,roll_no,course_id):
+    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    # return detail_attendance
+    # print(detail_attendance)
+    # for att in detail_attendance:
+    #     print(att.date)
+    return HttpResponse("Done with Detail Attendance")

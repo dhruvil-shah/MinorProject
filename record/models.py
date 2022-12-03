@@ -16,7 +16,7 @@ class Record(models.Model):
     roll_no=models.CharField(max_length=20)
     course=models.CharField(default="",max_length=20)
     time=models.CharField(max_length=30)
-    date=models.DateField(auto_now=True)
+    date=models.DateField()
     present=models.BooleanField(default=False)
 
 class CourseStudent(models.Model):
