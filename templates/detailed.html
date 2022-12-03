@@ -2,8 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Required meta tags -->
-     <meta charset="utf-8">
+    <meta charset="utf-8">
      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
      <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="{% static "owl.carousel.min.css"%}">
@@ -95,49 +94,41 @@
      </style>
 </head>
 <body>
-  <div class="detail">
-    <h4><span class="hello-msg" style="color:white" >Hello {{request.user}} <button class="btn success"><a  style="color:black" class="hello-msg" href="{% url 'logout' %}">Logout</a></button> </span>
-    </h4>
-  </div>
-
-  <div class="content">
-    <div class="container">
-      <h2 class="mb-5">ATTENDANCE DETAILS</h2>
-      <div class="table-responsive">
-        <table class="table table-striped custom-table">
-          <thead class="thead-light">
-        <tr>
-          <td scope="col">sub.no</th>
-          <th scope="col">Course_Name</th>
-          <th scope="col">Present</th>
-          <th scope="col">Absent</th>
-          <th scope="col">Percentage</th>
-          <th scope="col">Detailed ATTENDANCE</th>
-        </tr>
-      </thead>
-          <tbody>
-            <tbody>
-              {% for line in data %}
-              <tr>
-                <td>{{line.serial_no}}</td>
-                <td>{{ line.course_id }}</td>
-                <td>{{ line.present }}</td>
-                <td>{{ line.absent }}</td>
-                <td>{{ line.percentage}}</td>
-                <td><a href="getDetailAttendance/{{request.user}}/{{line.course_id}}">View</a></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </tbody>
-        </table>
-      </div>
+    <div class="detail">
+        <h4><span class="hello-msg" style="color:white" >Hello {{request.user}} <button class="btn success"><a  style="color:black" class="hello-msg" href="{% url 'dashboard' %}">Back</a></button> </span>
+        </h4>
     </div>
-  </div>
-
-    <script src="{% static "jquery-3.3.1.min.js"%}"></script>
-    <script src="{% static "popper.min.js"%}"></script>
-    <script src="{% static "bootstrap.min.js"%}"></script>
-    <script src="{% static "main.js"%}"></script>
-
+    <div class="content">
+        <div class="container">
+          <h2 class="mb-5"><u>COURSE:{{course_id}}</u>  (Detailed_Attendance)</h2>
+          <div class="table-responsive">
+            <table class="table table-striped custom-table">
+              <thead class="thead-light">
+            <tr>
+              <td scope="col">Date</th>
+              <th scope="col">Time</th>
+              <th scope="col">Present</th>
+            </tr>
+          </thead>
+              <tbody>
+                <tbody>
+                  {% for line in data %}
+                  <tr>
+                    <td>{{line.date}}</td>
+                    <td>{{ line.time }}</td>
+                    <td>{{ line.present }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+        <script src="{% static "jquery-3.3.1.min.js"%}"></script>
+        <script src="{% static "popper.min.js"%}"></script>
+        <script src="{% static "bootstrap.min.js"%}"></script>
+        <script src="{% static "main.js"%}"></script>
 </body>
 </html>

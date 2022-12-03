@@ -128,8 +128,6 @@ def dashboard(request):
         print(lst)
         return render(request,'dashboard.html',context)
 
-
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
 def home(request):
@@ -296,4 +294,5 @@ def getDetailAttendance(request,roll_no,course_id):
     # print(detail_attendance)
     # for att in detail_attendance:
     #     print(att.date)
-    return HttpResponse("Done with Detail Attendance")
+    context={"data":detail_attendance,"course_id":course_id}
+    return render(request,'detailed.html',context)
