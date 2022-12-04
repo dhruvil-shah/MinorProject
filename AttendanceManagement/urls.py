@@ -35,5 +35,6 @@ urlpatterns = [
     path('getCourses/<str:roll_no>',views.getCourses, name='getCourses'),
     path('dashboard/getDetailAttendance/<str:roll_no>/<str:course_id>',views.getDetailAttendance,name='getDetailAttendance'),
     path('detailed/getExcelDetail/<str:roll_no>/<str:course_id>',views.getExcelDetail,name='getExcelDetail'),
-    path('dashboard/getAttendanceByProf/<str:course_id>/<str:roll_no>/<str:start_date>/<str:end_date>/',views.getAttendanceByProf,name='getAttendanceByProf')
+    path('dashboard/getAttendanceByProf/<str:course_id>/<str:roll_no>/<str:start_date>/<str:end_date>/',views.getAttendanceByProf,name='getAttendanceByProf'),
+    path('dashboard/getExcelDetail1/<str:course_id>/<str:roll_no>/<str:start_date>/<str:end_date>/',views.getExcelDetail1,name='getExcelDetail1'),
 ]

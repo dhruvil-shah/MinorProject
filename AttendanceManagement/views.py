@@ -32,6 +32,7 @@ import time
 import os
 import numpy as np
 import face_recognition
+import datetime
 import json
 from numpy import asarray, roll,save,load
 
@@ -263,7 +264,8 @@ def detectFaces(request,course,start,end):
                 rec=Record(roll_no=roll,course=course,time=""+start+"-"+end+"",date=datetime.datetime.now(),present=False)
                 rec.save()   
             break
-    return HttpResponse("Done with Detecting")
+    context={"present":list(detectedRoll),"absent":list(absentRoll)}
+    return render(request,'detect.html',context)
 
 def showRecord(request):
     return HttpResponse("Record Shown")
@@ -334,7 +336,10 @@ def getExcelDetail(request,roll_no,course_id):
     wb.save(response)
     return response
 
-def getAttendanceByProf(request,course_id,roll_no,start_date,end_date):
+def getDetailDateWise(course_id,roll_no,start_date,end_date):
+    roll_no=roll_no.replace(" ","")
+    start_date=datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date=datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
     detail_attendance=None
     if roll_no=="" and course_id=="none":
          detail_attendance=Record.objects.all().filter()
@@ -344,9 +349,48 @@ def getAttendanceByProf(request,course_id,roll_no,start_date,end_date):
          detail_attendance=Record.objects.all().filter(roll_no=roll_no)
     else:
          detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    for rec in detail_attendance:
+        print(rec.date)
     final_record=[]
     for record in detail_attendance:
         if start_date <= record.date <= end_date:
             final_record.append(record)
-    print(final_record)
-    return HttpResponse("Done with Prof Part")
+    return final_record
+
+def getAttendanceByProf(request,course_id,roll_no,start_date,end_date):
+    final_record=getDetailDateWise(course_id,roll_no,start_date,end_date)
+    context={"data":final_record}
+    return render(request,'tdashboard.html',context)
+
+def getExcelDetail1(request,course_id,roll_no,start_date,end_date):
+    detail_attendance=getDetailDateWise(course_id,roll_no,start_date,end_date)
+    dt_attendance=[]
+    for rec in detail_attendance:
+        print(rec.date)
+        z=[rec.roll_no,rec.course,rec.time,str(rec.date),rec.present]
+        dt_attendance.append(z)
+
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="users.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Users')
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['roll_no', 'course', 'time','date','present' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    for row in dt_attendance:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+    wb.save(response)
+    return response
