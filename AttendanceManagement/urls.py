@@ -32,5 +32,6 @@ urlpatterns = [
     path('courseOption/',views.courseOption, name='courseOption'),
     path('getAttendance/<str:course_id>/<str:roll_no>',views.getAttendance, name='getAttendance'),
     path('getCourses/<str:roll_no>',views.getCourses, name='getCourses'),
-    path('getDetailAttendance/<str:roll_no>/<str:course_id>',views.getDetailAttendance,name='getDetailAttendance')
+    path('getDetailAttendance/<str:roll_no>/<str:course_id>',views.getDetailAttendance,name='getDetailAttendance'),
+    path('getAttendanceDateWise/<str:course_id>/<str:start_date>/<str:end_date>/',views.getAttendanceDateWise,name='getAttendanceDateWise')
 ]

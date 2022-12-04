@@ -18,6 +18,8 @@ from django.views.decorators.cache import cache_control
 from record.models import Record 
 from record.models import CourseStudent
 from django.contrib import messages
+from django.http import HttpResponse
+from django.contrib.auth.models import User
 
 from django.contrib.auth import authenticate,login,logout
 
@@ -30,6 +32,7 @@ import cv2
 import time
 import os
 import numpy as np
+import xlwt
 import face_recognition
 import json
 from numpy import asarray, roll,save,load
@@ -291,9 +294,42 @@ def courseOption(request):
     return render(request,'options.html',context)
 
 def getDetailAttendance(request,roll_no,course_id):
-    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
-    # return detail_attendance
-    # print(detail_attendance)
-    # for att in detail_attendance:
-    #     print(att.date)
-    return HttpResponse("Done with Detail Attendance")
+    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id).values_list('date', 'time', 'present')
+    dt_attendance=[]
+    for rec in detail_attendance:
+        rec=list(rec)
+        rec[0]=rec[0].strftime("%m/%d/%Y")
+        dt_attendance.append(rec)
+
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="users.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Users')
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['date', 'time', 'present' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    for row in dt_attendance:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+    wb.save(response)
+    return response
+
+def getAttendanceDateWise(request,course_id,start_date,end_date):
+    detail_attendance=Record.objects.all().filter(course=course_id)
+    for dt in detail_attendance:
+        print(type(dt.date))
+    return HttpResponse("Done with new Response")
+
+
