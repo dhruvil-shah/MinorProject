@@ -18,6 +18,7 @@ from django.views.decorators.cache import cache_control
 from record.models import Record 
 from record.models import CourseStudent
 from django.contrib import messages
+import xlwt
 
 from django.contrib.auth import authenticate,login,logout
 
@@ -135,6 +136,9 @@ def home(request):
         return render(request,'home.html')
     else:
         return redirect('dashboard')
+
+def tdashboard(request):
+    return render(request,'tdashboard.html')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
@@ -296,3 +300,53 @@ def getDetailAttendance(request,roll_no,course_id):
     #     print(att.date)
     context={"data":detail_attendance,"course_id":course_id}
     return render(request,'detailed.html',context)
+
+def getExcelDetail(request,roll_no,course_id):
+    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id).values_list('date', 'time', 'present')
+    dt_attendance=[]
+    for rec in detail_attendance:
+        rec=list(rec)
+        rec[0]=rec[0].strftime("%m/%d/%Y")
+        dt_attendance.append(rec)
+
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="users.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Users')
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['date', 'time', 'present' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    for row in dt_attendance:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+    wb.save(response)
+    return response
+
+def getAttendanceByProf(request,course_id,roll_no,start_date,end_date):
+    detail_attendance=None
+    if roll_no=="" and course_id=="none":
+         detail_attendance=Record.objects.all().filter()
+    elif roll_no=="":
+         detail_attendance=Record.objects.all().filter(course=course_id)
+    elif course_id=="none":
+         detail_attendance=Record.objects.all().filter(roll_no=roll_no)
+    else:
+         detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    final_record=[]
+    for record in detail_attendance:
+        if start_date <= record.date <= end_date:
+            final_record.append(record)
+    print(final_record)
+    return HttpResponse("Done with Prof Part")

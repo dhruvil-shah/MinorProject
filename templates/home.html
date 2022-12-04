@@ -102,21 +102,21 @@
               <a href="/courseOption"><img src="{% static 'images/detect.jpg' %}" class="img-responsive" style="width:100px;height:100px ;" /></a>
                {% comment %} <a href='{%url "detectFaces/" %}'><img src="{% static 'images/detect.jpg' %}" class="img-responsive" style="width:100px;height:100px ;" /></a>  {% endcomment %}
                <h4> Detect</h4>
-               {% comment %} <script>
+                {% comment %} <script>
                 function myFunction1() {
                     let course = prompt("Please enter Course Code:");
                     if (course !== null ||course !== "") {
                        window.location.href=`http://127.0.0.1:8000/detectFaces/${course}`;
                     }
                   }
-               </script> {% endcomment %}
+               </script>  {% endcomment %}
             </div>
           </div>
-          {% comment %} <div>
-              <a href='{%url "trainModel" %}'><img src="{% static 'images/Train.png' %}" class="img-responsive" style="width:100px;height:100px" /></a> 
-              <h4 >Train Model</h4>
+           <div>
+              <a href='{% url 'tdashboard' %}'><img src="{% static 'images/tdash.png' %}" class="img-responsive" style="width:100px;height:100px" /></a> 
+              <h4 >Data</h4>
           </div>
-           {% endcomment %}
+           
       </div> 
 
 </body>

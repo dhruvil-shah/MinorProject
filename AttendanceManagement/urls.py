@@ -25,6 +25,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard,name='dashboard'),
     path('admin/', admin.site.urls),
     path('home/', views.home,name='home'),
+    path('tdashboard/', views.tdashboard,name='tdashboard'),
     path('addImage/<str:id>',views.addImages, name='addImage'),
     # path('trainModel/',views.trainModel, name='trainModel'),
     path('detectFaces/<str:course>/<str:start>/<str:end>',views.detectFaces, name='detectFaces'),
@@ -33,5 +34,6 @@ urlpatterns = [
     path('getAttendance/<str:course_id>/<str:roll_no>',views.getAttendance, name='getAttendance'),
     path('getCourses/<str:roll_no>',views.getCourses, name='getCourses'),
     path('dashboard/getDetailAttendance/<str:roll_no>/<str:course_id>',views.getDetailAttendance,name='getDetailAttendance'),
-
+    path('detailed/getExcelDetail/<str:roll_no>/<str:course_id>',views.getExcelDetail,name='getExcelDetail'),
+    path('dashboard/getAttendanceByProf/<str:course_id>/<str:roll_no>/<str:start_date>/<str:end_date>/',views.getAttendanceByProf,name='getAttendanceByProf')
 ]
