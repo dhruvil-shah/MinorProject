@@ -18,8 +18,7 @@ from django.views.decorators.cache import cache_control
 from record.models import Record 
 from record.models import CourseStudent
 from django.contrib import messages
-from django.http import HttpResponse
-from django.contrib.auth.models import User
+import xlwt
 
 from django.contrib.auth import authenticate,login,logout
 
@@ -32,7 +31,6 @@ import cv2
 import time
 import os
 import numpy as np
-import xlwt
 import face_recognition
 import json
 from numpy import asarray, roll,save,load
@@ -131,8 +129,6 @@ def dashboard(request):
         print(lst)
         return render(request,'dashboard.html',context)
 
-
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
 def home(request):
@@ -140,6 +136,9 @@ def home(request):
         return render(request,'home.html')
     else:
         return redirect('dashboard')
+
+def tdashboard(request):
+    return render(request,'tdashboard.html')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 @login_required(login_url='login')
@@ -294,6 +293,15 @@ def courseOption(request):
     return render(request,'options.html',context)
 
 def getDetailAttendance(request,roll_no,course_id):
+    detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    # return detail_attendance
+    # print(detail_attendance)
+    # for att in detail_attendance:
+    #     print(att.date)
+    context={"data":detail_attendance,"course_id":course_id}
+    return render(request,'detailed.html',context)
+
+def getExcelDetail(request,roll_no,course_id):
     detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id).values_list('date', 'time', 'present')
     dt_attendance=[]
     for rec in detail_attendance:
@@ -326,10 +334,19 @@ def getDetailAttendance(request,roll_no,course_id):
     wb.save(response)
     return response
 
-def getAttendanceDateWise(request,course_id,start_date,end_date):
-    detail_attendance=Record.objects.all().filter(course=course_id)
-    for dt in detail_attendance:
-        print(type(dt.date))
-    return HttpResponse("Done with new Response")
-
-
+def getAttendanceByProf(request,course_id,roll_no,start_date,end_date):
+    detail_attendance=None
+    if roll_no=="" and course_id=="none":
+         detail_attendance=Record.objects.all().filter()
+    elif roll_no=="":
+         detail_attendance=Record.objects.all().filter(course=course_id)
+    elif course_id=="none":
+         detail_attendance=Record.objects.all().filter(roll_no=roll_no)
+    else:
+         detail_attendance=Record.objects.all().filter(roll_no=roll_no,course=course_id)
+    final_record=[]
+    for record in detail_attendance:
+        if start_date <= record.date <= end_date:
+            final_record.append(record)
+    print(final_record)
+    return HttpResponse("Done with Prof Part")
