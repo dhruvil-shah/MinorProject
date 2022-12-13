@@ -91,6 +91,17 @@
         border-left: solid 1px black;
         style="text-align: center";
       }
+      .link{
+        text-decoration:none;
+        color:white;
+      }
+      button{
+        background:black;
+        color:white;
+        display:flex;
+        margin:10px auto;
+
+      }
      </style>
 </head>
 <body>
@@ -124,7 +135,7 @@
             </table>
           </div>
         </div>
-        <a href="http://127.0.0.1:8000/detailed/getExcelDetail/{{request.user}}/{{course_id}}">Download Excel</a>
+        <button><a class='link' href="http://127.0.0.1:8000/detailed/getExcelDetail/{{request.user}}/{{course_id}}">Download Excel</a></button>
       </div>
       
         <script src="{% static "jquery-3.3.1.min.js"%}"></script>

@@ -9,7 +9,7 @@
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up Form by Colorlib</title>
+    <title>Sign In Form by Colorlib</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static "style.css"%}">
@@ -38,6 +38,10 @@
 		  .closebtn:hover {
 			color: black;
 		  }
+		  .sign-in{
+			display:flex;
+			margin:100px auto;
+		  }
 	</style>
 </head>
 <body>
@@ -49,7 +53,7 @@
 					<a href="{% url 'register' %}" class="signup-image-link">Create an account</a>
 				</div>
 				<div class="signin-form">
-					<h2 class="form-title">Sign up</h2>
+					<h2 class="form-title">Sign In</h2>
 					<form method="POST" class="register-form" id="login-form">
 						{% csrf_token%}
 						<div class="form-group">

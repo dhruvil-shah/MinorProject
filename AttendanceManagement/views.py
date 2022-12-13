@@ -237,7 +237,7 @@ def detectFaces(request,course,start,end):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             min_dis=min(faceDis)
-            if min_dis>0.3:
+            if min_dis>0.5:
                 continue
             matchIndex = np.argmin(faceDis)
             # print(matchIndex)
